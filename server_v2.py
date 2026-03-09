@@ -287,7 +287,26 @@ def process_message(user_message):
         else:
             response = "抱歉，找不到相關文獻。請試試其他關鍵字。"
     
-    if intent == "SOP" or intent == "both":
+    # 檢測是否為特定實驗類型
+    experiment_type = ""
+    if any(k in msg_lower for k in ['rna', '萃取', 'extraction']):
+        experiment_type = "rna"
+    elif any(k in msg_lower for k in ['wound', 'healing', 'migration', 'scratch', '遷移']):
+        experiment_type = "wound"
+    elif any(k in msg_lower for k in ['western', 'wb', '西方']):
+        experiment_type = "western"
+    elif any(k in msg_lower for k in ['pcr', 'qpcr']):
+        experiment_type = "pcr"
+    elif any(k in msg_lower for k in ['流式', 'flow']):
+        experiment_type = "flow"
+    elif any(k in msg_lower for k in ['knockdown', 'knockout', 'crispr', 'rnai', 'sirna']):
+        experiment_type = "knockdown"
+    elif any(k in msg_lower for k in ['培養', 'culture', '種植', '傳代']):
+        experiment_type = "culture"
+    elif any(k in msg_lower for k in ['白血病', '血癌', '淋巴瘤']):
+        experiment_type = "leukemia"
+    
+    if intent == "SOP" or intent == "both" or experiment_type:
         # 生成 SOP - 先分析論文內容，再生成
         sop_intro = "📋 根據文獻資料，以下是實驗流程：\n\n" if papers else "📋 以下是實驗流程：\n\n"
         
@@ -396,6 +415,52 @@ Day 3 - 效率評估
 - 每次實驗需包含陽性和陰性對照組
 - 確認轉染效率 (>70%)
 - 建議做三個生物重複
+"""
+        
+        elif experiment_type == "leukemia" or any(k in msg_lower for k in ['白血病', '血癌', 'leukemia']):
+            sop = """
+【白血病細胞培養實驗】
+
+📌 實驗概述：
+白血病細胞的體外培養與相關實驗
+
+📦 所需材料：
+• RPMI 1640 培養基
+• 10-20% FBS (建議熱滅活)
+• 1% Penicillin-Streptomycin
+• L-Glutamine (2 mM)
+• PBS
+• Trypsin-EDTA
+• 流式細胞儀試劑
+
+📝 詳細步驟：
+
+Day 1 - 細胞種植
+1. 準備培養基 (RPMI-1640 + 10% FBS + 1% P/S)
+2. 從液態氮取出細胞，快速回溫 (37°C水浴)
+3. 離心 (1000 rpm, 5 min)
+4. 移除凍存液，重懸於新鮮培養基
+5. 種植於培養瓶 (T25 或 T75)
+6. 放入 CO2 培養箱 (37°C, 5% CO2)
+
+Day 2-3 - 觀察與換液
+1. 顯微鏡觀察細胞狀態
+2. 懸浮細胞：每 2-3 天換液
+3. 半懸浮細胞：每天觀察
+
+每 2-3 天傳代：
+1. 收集細胞
+2. 離心 (1000 rpm, 5 min)
+3. 移除上清
+4. 重懸於新培養基
+5. 種植新瓶 (1:2 至 1:4)
+
+⚠️ 注意事項：
+- 白血病細胞較脆弱，動作要輕柔
+- 定期檢查是否有污染
+- 細胞活性維持 >90%
+
+⏱️ 培養溫度：37°C, 5% CO2
 """
         
         elif any(k in msg_lower for k in ['培養', 'culture']):
