@@ -17,6 +17,16 @@ from datetime import datetime
 app = Flask(__name__)
 app.secret_key = 'ai-lab-copilot-secret-key'
 
+# Favicon 路由
+@app.route('/favicon.svg')
+def favicon():
+    from flask import send_from_directory
+    return send_from_directory('.', 'favicon.svg', mimetype='image/svg+xml')
+
+@app.route('/<path:filename>')
+def serve_static(filename):
+    return send_from_directory('.', filename) = 'ai-lab-copilot-secret-key'
+
 # API 配置
 PUBMED_API_KEY = "475cc6bec6ab03e64d2acc533b97bd641609"
 

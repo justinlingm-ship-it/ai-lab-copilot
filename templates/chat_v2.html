@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <title>AI Lab CoPilot - 智慧實驗助手</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -175,12 +176,12 @@
 </head>
 <body>
     <div class="header">
-        <h1>🧬 AI Lab CoPilot <span class="badge">輕量版</span></h1>
+        <h1>🧬 AI Lab CoPilot <span class="badge">AI 助手</span></h1>
     </div>
     
     <div class="chat-container" id="chatContainer">
         <div class="message assistant">
-            <div class="message-avatar">🤖</div>
+            <div class="message-avatar">🧑‍🔬</div>
             <div class="message-content">
 🧪 你好！我是 AI Lab CoPilot
 
@@ -258,7 +259,7 @@
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${role}`;
             messageDiv.innerHTML = `
-                <div class="message-avatar">${role === 'user' ? '👤' : '🤖'}</div>
+                <div class="message-avatar">${role === 'user' ? '👤' : '🧑‍🔬'}</div>
                 <div class="message-content">${content}${paperHtml}</div>
             `;
             container.appendChild(messageDiv);
@@ -273,7 +274,7 @@
             loadingDiv.id = 'loading';
             loadingDiv.className = 'message assistant';
             loadingDiv.innerHTML = `
-                <div class="message-avatar">🤖</div>
+                <div class="message-avatar">🧑‍🔬</div>
                 <div class="message-content"><div class="loading"><div class="spinner"></div><span>搜尋中...</span></div></div>
             `;
             container.appendChild(loadingDiv);
