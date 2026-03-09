@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Lab CoPilot - 智慧實驗助手</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #f5f5f5;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 1.3em;
+        }
+        
+        .header .badge {
+            background: #4CAF50;
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-size: 0.7em;
+        }
+        
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            max-width: 900px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        .message {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .message.user { flex-direction: row-reverse; }
+        
+        .message-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            flex-shrink: 0;
+        }
+        
+        .message.user .message-avatar { background: #667eea; }
+        .message.assistant .message-avatar { background: #4CAF50; }
+        
+        .message-content {
+            max-width: 70%;
+            background: white;
+            padding: 12px 16px;
+            border-radius: 18px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+        
+        .message.user .message-content {
+            background: #667eea;
+            color: white;
+        }
+        
+        .paper-list { margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee; }
+        
+        .paper-item {
+            background: #f8f9fa;
+            padding: 8px 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+        }
+        
+        .paper-item a { color: #667eea; text-decoration: none; }
+        
+        .input-container {
+            background: white;
+            padding: 15px 20px;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .input-wrapper {
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .input-wrapper input {
+            flex: 1;
+            padding: 12px 18px;
+            font-size: 1em;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            outline: none;
+        }
+        
+        .input-wrapper input:focus { border-color: #667eea; }
+        
+        .input-wrapper button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+        }
+        
+        .input-wrapper button:disabled { opacity: 0.6; cursor: not-allowed; }
+        
+        .suggestions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+            justify-content: center;
+        }
+        
+        .suggestions span {
+            background: #f0f0f0;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            cursor: pointer;
+        }
+        
+        .suggestions span:hover { background: #e0e0e0; }
+        
+        .loading {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px;
+            color: #666;
+        }
+        
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🧬 AI Lab CoPilot <span class="badge">輕量版</span></h1>
+    </div>
+    
+    <div class="chat-container" id="chatContainer">
+        <div class="message assistant">
+            <div class="message-avatar">🤖</div>
+            <div class="message-content">
+🧪 你好！我是 AI Lab CoPilot
+
+我可以幫你：
+• 搜尋近4年的 PubMed 文獻
+• 生成實驗 SOP 流程
+• 回答實驗相關問題
+
+試試問我：
+「幫我搜尋 1A9 wound healing」
+或「RNA 萃取實驗 SOP」</div>
+        </div>
+        
+        <div class="suggestions">
+            <span onclick="sendMessage('1A9 wound healing 實驗')">🧪 1A9 wound healing</span>
+            <span onclick="sendMessage('RNA 萃取 SOP')">🧬 RNA 萃取</span>
+            <span onclick="sendMessage('Western blot 流程')">🔬 Western blot</span>
+            <span onclick="sendMessage('Paclitaxel 細胞遷移實驗')">💊 Paclitaxel 實驗</span>
+        </div>
+    </div>
+    
+    <div class="input-container">
+        <div class="input-wrapper">
+            <input type="text" id="userInput" placeholder="輸入你的問題..." onkeypress="handleKeyPress(event)">
+            <button id="sendBtn" onclick="sendMessage()">送出</button>
+        </div>
+    </div>
+    
+    <script>
+        let isLoading = false;
+        
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') sendMessage();
+        }
+        
+        async function sendMessage(text) {
+            const input = document.getElementById('userInput');
+            const message = text || input.value.trim();
+            if (!message || isLoading) return;
+            
+            addMessage('user', message);
+            input.value = '';
+            showLoading();
+            
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({message: message})
+                });
+                const data = await response.json();
+                hideLoading();
+                addMessage('assistant', data.response, data.papers || []);
+            } catch (error) {
+                hideLoading();
+                addMessage('assistant', '抱歉，發生錯誤。');
+            }
+        }
+        
+        function addMessage(role, content, papers = []) {
+            const container = document.getElementById('chatContainer');
+            let paperHtml = '';
+            if (papers && papers.length > 0) {
+                paperHtml = '<div class="paper-list">';
+                papers.forEach((p, i) => {
+                    paperHtml += `<div class="paper-item">
+                        <strong>【${i+1}】${p.title}</strong><br>
+                        PMID: ${p.pmid} | ${p.journal} (${p.year})<br>
+                        <a href="https://doi.org/${p.doi}" target="_blank">${p.doi}</a>
+                    </div>`;
+                });
+                paperHtml += '</div>';
+            }
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${role}`;
+            messageDiv.innerHTML = `
+                <div class="message-avatar">${role === 'user' ? '👤' : '🤖'}</div>
+                <div class="message-content">${content}${paperHtml}</div>
+            `;
+            container.appendChild(messageDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+        
+        function showLoading() {
+            isLoading = true;
+            document.getElementById('sendBtn').disabled = true;
+            const container = document.getElementById('chatContainer');
+            const loadingDiv = document.createElement('div');
+            loadingDiv.id = 'loading';
+            loadingDiv.className = 'message assistant';
+            loadingDiv.innerHTML = `
+                <div class="message-avatar">🤖</div>
+                <div class="message-content"><div class="loading"><div class="spinner"></div><span>搜尋中...</span></div></div>
+            `;
+            container.appendChild(loadingDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+        
+        function hideLoading() {
+            isLoading = false;
+            document.getElementById('sendBtn').disabled = false;
+            const loading = document.getElementById('loading');
+            if (loading) loading.remove();
+        }
+    </script>
+</body>
+</html>
