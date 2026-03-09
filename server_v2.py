@@ -78,10 +78,14 @@ def search_pubmed(query, max_results=5):
     for cn, en in translation.items():
         search_query = search_query.replace(cn, en)
     
-    # 分割成關鍵字，用 OR 連接
+    # 分割成關鍵字，用 AND 連接（更精確）
     keywords = search_query.split()
     if len(keywords) > 1:
-        search_query = " OR ".join(keywords)
+        # 使用 AND 讓所有關鍵字都必須出現
+        search_query = " AND ".join([f"({k})" for k in keywords])
+    else:
+        # 單一關鍵字周圍加括号
+        search_query = f"({search_query})"
     
     # 如果翻譯後跟原本不一樣，用翻譯版
     if search_query != query:
@@ -268,9 +272,10 @@ def process_message(user_message):
         papers = parse_papers(xml_data)
     
     # 生成回覆 - 永遠生成 SOP（如果找到論文）
-    if intent == "搜尋" and papers:
-        # 改為同時生成 SOP
-        intent = "both"
+    if papers:
+        # 有論文就生成 SOP
+        if intent == "搜尋":
+            intent = "both"
     
     if intent == "搜尋":
         if papers:
@@ -350,6 +355,49 @@ Day 2 - 溶解
 3. NanoDrop 定量
 4. -80°C 保存
 """
+        elif any(k in msg_lower for k in ['knockdown', 'knock-out', 'knockout', 'knock-in', 'knockin', 'RNAi', 'siRNA', 'shRNA', 'CRISPR', '基因沉默']):
+            # 基因 knockdown/knockout SOP
+            sop = """
+【基因功能分析實驗 (Knockdown/Knockout)】
+
+📌 實驗概述：
+利用 RNAi 或 CRISPR 技術降低或剔除目標基因表現
+
+📦 所需材料：
+• siRNA/shRNA 或 CRISPR plasmids
+• 轉染試劑 (Lipofectamine 3000)
+• Opti-MEM 培養基
+• 6-well plate
+• qPCR 引子
+• Western Blot 抗體
+
+📝 詳細步驟：
+
+Day 1 - 細胞種植
+1. 種植適當細胞於 6-well plate
+2. 密度: 70-80% 融合度
+3. 培養過夜
+
+Day 2 - 轉染
+1. 準備 A 溶液：Opti-MEM + siRNA/shRNA (100 nM)
+2. 準備 B 溶液：Opti-MEM + Lipofectamine 3000
+3. 混合 A + B，室溫孵育 15 分鐘
+4. 加入細胞中
+5. 4-6 小時後更換新鮮培養基
+
+Day 3 - 效率評估
+1. 收集細胞
+2. RNA 萃取 → qPCR 驗證基因表現
+3. 或蛋白質萃取 → Western Blot 驗證
+
+⏱️ 建議時間點：24, 48, 72 小時
+
+⚠️ 注意事項：
+- 每次實驗需包含陽性和陰性對照組
+- 確認轉染效率 (>70%)
+- 建議做三個生物重複
+"""
+        
         elif any(k in msg_lower for k in ['培養', 'culture']):
             # 細胞培養 SOP
             cell_type = ', '.join(extracted_info.get('cells', [])) if extracted_info.get('cells') else '適當細胞'

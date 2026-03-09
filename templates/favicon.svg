@@ -1,4 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <rect width="32" height="32" fill="#667eea" rx="6"/>
-  <text x="4" y="22" font-family="monospace" font-size="14" fill="white">ATCG</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea"/>
+      <stop offset="100%" style="stop-color:#764ba2"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="12" fill="url(#g1)"/>
+  <text x="32" y="44" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="white" text-anchor="middle">G</text>
+  <circle cx="48" cy="16" r="6" fill="#4CAF50"/>
 </svg>
